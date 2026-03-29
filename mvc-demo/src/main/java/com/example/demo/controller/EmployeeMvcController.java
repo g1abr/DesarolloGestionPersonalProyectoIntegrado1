@@ -7,9 +7,13 @@ package com.example.demo.controller;
 
 import com.example.demo.model.EmployeeEntity;
 import com.example.demo.service.EmployeeService;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,7 +26,6 @@ public class EmployeeMvcController {
     @Autowired
     private EmployeeService service;
 
-
     @GetMapping("/")
     public String viewHomePage(Model model,
             @RequestParam(value = "search", required = false) String searchTerm) {
@@ -34,13 +37,11 @@ public class EmployeeMvcController {
             model.addAttribute("employees", service.getAllEmployees());
         }
 
-    
         model.addAttribute("totalEmployees", service.getTotalEmployees());
         model.addAttribute("averageSalary", service.getAverageSalary());
 
         return "list-employees";
     }
-    
 
     @GetMapping("/addEmployee")
     public String showAddEmployeeForm(Model model) {
@@ -49,8 +50,32 @@ public class EmployeeMvcController {
     }
 
     @PostMapping("/save")
-    public String saveEmployee(@ModelAttribute("employee") EmployeeEntity employee) {
-        service.createOrUpdateEmployee(employee);
+    public String saveEmployee(
+            @Valid @ModelAttribute("employee") EmployeeEntity employee,
+            BindingResult result,
+            Model model) {
+
+        if (employee.getId() == null) {
+            if (service.emailExists(employee.getEmail())) {
+                result.rejectValue("email", null, "Este correo ya está registrado");
+            }
+        } else {
+            if (service.emailExistsForOtherEmployee(employee.getEmail(), employee.getId())) {
+                result.rejectValue("email", null, "Este correo ya está registrado");
+            }
+        }
+
+        if (result.hasErrors()) {
+            return "add-edit-employee";
+        }
+
+        try {
+            service.createOrUpdateEmployee(employee);
+        } catch (Exception e) {
+            result.rejectValue("email", null, "Este correo ya está registrado");
+            return "add-edit-employee";
+        }
+
         return "redirect:/";
     }
 

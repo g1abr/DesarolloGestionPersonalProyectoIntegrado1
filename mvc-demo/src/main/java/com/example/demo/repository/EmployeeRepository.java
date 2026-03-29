@@ -7,7 +7,6 @@ package com.example.demo.repository;
 
 import com.example.demo.model.EmployeeEntity;
 
-
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -28,8 +27,10 @@ public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Long>
 
     long count();
 
-
     @Query("SELECT AVG(e.salary) FROM EmployeeEntity e")
     Double findAverageSalary();
+
+    boolean existsByEmail(String email);
+    boolean existsByEmailAndIdNot(String email, Long id);
 
 }

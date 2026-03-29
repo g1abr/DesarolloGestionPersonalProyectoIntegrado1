@@ -52,5 +52,10 @@ public class EmployeeService {
     public Double getAverageSalary() {
         return repository.findAverageSalary();
     }
-
+    public boolean emailExists(String email) {
+        return repository.existsByEmail(email);
+    }
+    public boolean emailExistsForOtherEmployee(String email, Long id) {
+    return repository.existsByEmailAndIdNot(email, id);
+}
 }

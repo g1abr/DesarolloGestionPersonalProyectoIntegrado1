@@ -11,6 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 
 /**
  *
@@ -24,18 +30,28 @@ public class EmployeeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 50, message = "El nombre no debe superar 50 caracteres")
     @Column(name = "first_name")
     private String firstName;
 
+    @NotBlank(message = "El apellido es obligatorio")
+    @Size(max = 50, message = "El apellido no debe superar 50 caracteres")
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "Formato de correo inválido")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "position") 
+    @NotBlank(message = "El cargo es obligatorio")
+    @Size(max = 50, message = "El cargo no debe superar 50 caracteres")
+    @Column(name = "position")
     private String position;
 
+    @NotNull(message = "El salario es obligatorio")
+    @Min(value = 1000000, message = "El salario mínimo permitido es 1.000.000")
     @Column(name = "salary")
     private Double salary;
 
